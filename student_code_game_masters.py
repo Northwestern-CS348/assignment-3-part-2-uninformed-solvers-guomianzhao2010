@@ -33,8 +33,22 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### student code goes here
-        pass
+        rep = []
+        for x in range(1, 4):
+            peg_tuple = []
+            #go through all facts
+            bindings = self.kb.kb_ask(parse_input("fact: (on ?x peg" + str(x) + ")"))
+            if bindings:
+                for item in bindings:
+                    #extrat each component
+                    disk_str = item['?x']
+                    disk_num = int(disk_str[-1])
+                    peg_tuple.append(disk_num)
+                    #add to tuple
+            peg_tuple.sort()
+            rep.append(tuple(peg_tuple))
+
+        return tuple(rep)
 
     def makeMove(self, movable_statement):
         """
@@ -52,8 +66,38 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             None
         """
-        ### Student code goes here
-        pass
+        # Student code goes here
+        disk = str(movable_statement.terms[0])
+        pegi = str(movable_statement.terms[1])
+        pegt = str(movable_statement.terms[2])
+
+
+        # before the move, if disk a was on top of diskb, diskb becomes top of pegi, 
+        ontop_bindings = self.kb.kb_ask(parse_input("fact: (ontop " + disk + " ?y)"))
+        if ontop_bindings:
+            new_top_disk = ontop_bindings[0]
+            self.kb.kb_retract(parse_input("fact: (ontop " + disk + " " + new_top_disk['?y'] + ")"))
+            self.kb.kb_assert(parse_input("fact: (top " + new_top_disk['?y'] + " " + pegi + ")"))
+        #if before the move, disk a was the only disk on pegi, then pegi is now empty
+        else:
+            self.kb.kb_assert(parse_input("fact: (empty " + pegi + ")"))
+        
+        top_bindings = self.kb.kb_ask(parse_input("fact: (top " + " ?x" + " " + pegt + ")"))
+        if top_bindings:
+            old_top_disk = top_bindings[0]
+            self.kb.kb_retract(parse_input("fact: (top " + old_top_disk['?x'] + " " + pegt + ")"))
+            self.kb.kb_assert(parse_input("fact: (ontop " + disk + " " + old_top_disk['?x'] + ")"))
+        #else, if pegt was empty, then we remove this fact
+        else:
+            self.kb.kb_retract(parse_input("fact: (empty " + pegt + ")"))
+
+         #basic ones 
+        self.kb.kb_retract(parse_input("fact: (top " + disk + " " + pegi + ")"))
+        self.kb.kb_assert(parse_input("fact: (top " + disk + " " + pegt + ")"))
+        self.kb.kb_retract(parse_input("fact: (on " + disk + " " + pegi + ")"))
+        self.kb.kb_assert(parse_input("fact: (on " + disk + " " + pegt + ")"))
+
+       
 
     def reverseMove(self, movable_statement):
         """
@@ -99,8 +143,117 @@ class Puzzle8Game(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### Student code goes here
-        pass
+        # Student code goes here
+        # fact: (x tile1 pos1)
+        # fact: (y tile1 pos1)
+
+        rep = []
+        row1 = []
+        row2 = []
+        row3 = []
+
+        #adding row 1
+        #add pos1 pos1 
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos1 pos1)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row1.append(tile_num)
+
+        #add pos2 pos1
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos2 pos1)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row1.append(tile_num)
+
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos3 pos1)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row1.append(tile_num)
+
+        # adding row 2
+        #add pos1 pos2
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos1 pos2)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row2.append(tile_num)
+
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos2 pos2)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row2.append(tile_num)
+
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos3 pos2)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row2.append(tile_num)
+
+        # add row 3
+        #add pos1 pos3 
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos1 pos3)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row3.append(tile_num)
+
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos2 pos3)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row3.append(tile_num)
+
+        bindings = self.kb.kb_ask(parse_input("fact: (at ?tile pos3 pos3)"))
+        if bindings:
+            tile_binding = bindings[0]
+            tile_str = tile_binding['?tile']
+            if tile_str == "empty":
+                tile_num = -1
+            else:
+                tile_num = int(tile_str[-1])
+            row3.append(tile_num)
+
+        rep.append(tuple(row1))
+        rep.append(tuple(row2))
+        rep.append(tuple(row3))
+
+        return tuple(rep)
 
     def makeMove(self, movable_statement):
         """
@@ -119,7 +272,20 @@ class Puzzle8Game(GameMaster):
             None
         """
         ### Student code goes here
-        pass
+        tile =str(movable_statement.terms[0])
+        xi = str(movable_statement.terms[1])
+        yi = str(movable_statement.terms[2])
+        xt = str(movable_statement.terms[3])
+        yt = str(movable_statement.terms[4])
+      
+
+        self.kb.kb_retract(parse_input("fact: (at " + tile + " " + xi + " " + yi + ")"))
+        self.kb.kb_retract(parse_input("fact: (at  empty " + xt + " " + yt + ")"))
+
+        self.kb.kb_assert(parse_input("fact: (at " + tile + " " + xt + " " + yt + ")"))
+        self.kb.kb_assert(parse_input("fact: (at  empty " + xi + " " + yi + ")"))
+
+
 
     def reverseMove(self, movable_statement):
         """
